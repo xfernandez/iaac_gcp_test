@@ -1,0 +1,72 @@
+- name: Instalar NGINX
+  apt:
+    name: nginx
+    state: present
+    update_cache: yes
+
+- name: Asegurar que NGINX está habilitado y activo
+  service:
+    name: nginx
+    state: started
+    enabled: yes
+
+- name: Copiar plantilla HTML personalizada
+  template:
+    src: index.html.j2
+    dest: /var/www/html/index.html
+  notify: Reiniciar NGINX
+
+- name: Crear script para generar ID único
+  copy:
+    dest: /usr/local/bin/generate-id.sh
+    content: |
+      #!/bin/bash
+      # Forzar la generación de un nuevo ID cada vez
+      uuidgen > /etc/unique_id
+      chown www-data:www-data /etc/unique_id
+      chmod 644 /etc/unique_id
+    mode: '0755'
+
+- name: Crear servicio systemd para generar ID
+  copy:
+    dest: /etc/systemd/system/generate-id.service
+    content: |
+      [Unit]
+      Description=Generate Unique ID
+      After=network.target
+
+      [Service]
+      Type=oneshot
+      ExecStart=/usr/local/bin/generate-id.sh
+      RemainAfterExit=yes
+
+      [Install]
+      WantedBy=multi-user.target
+  notify: Habilitar generate-id
+
+- name: Reemplazar configuración por defecto de NGINX
+  template:
+    src: nginx-default.conf.j2
+    dest: /etc/nginx/sites-available/default
+  notify: Reiniciar NGINX
+
+- name: Verificar configuración de NGINX
+  command: nginx -t
+  register: nginx_test
+  changed_when: false
+
+- name: Mostrar resultado de la verificación de NGINX
+  debug:
+    var: nginx_test.stdout_lines
+
+- name: Mostrar logs de NGINX
+  command: journalctl -xeu nginx.service
+  register: nginx_logs
+  changed_when: false
+  when: nginx_test.rc != 0
+
+- name: Mostrar logs de NGINX si hay error
+  debug:
+    var: nginx_logs.stdout_lines
+  when: nginx_test.rc != 0
+

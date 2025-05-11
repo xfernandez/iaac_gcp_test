@@ -1,0 +1,33 @@
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+!example.tfvars
+.terraformrc
+terraform.rc
+.terraform.lock.hcl
+crash.log
+crash.*.log
+
+# Ansible
+*.retry
+*.pyc
+__pycache__/
+.ansible/
+
+# Credenciales y secretos
+.env
+.env.*
+*.pem
+*.key
+*.crt
+credentials.json
+service-account.json
+
+# Sistema
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*~

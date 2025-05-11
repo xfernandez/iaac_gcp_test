@@ -1,0 +1,17 @@
+- name: Reiniciar NGINX
+  service:
+    name: nginx
+    state: restarted
+  register: nginx_restart
+
+- name: Mostrar error de reinicio de NGINX si falla
+  debug:
+    var: nginx_restart
+  when: nginx_restart is failed
+
+- name: Habilitar generate-id
+  systemd:
+    name: generate-id
+    state: started
+    enabled: yes
+    daemon_reload: yes

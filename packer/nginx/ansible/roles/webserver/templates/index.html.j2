@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Hola Mundo</title>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+  </head>
+  <body>
+    <h1>Hola Mundo desde la máquina con ID:</h1>
+    <pre><iframe src="/id" style="border:none;" height="30"></iframe></pre>
+    <p>Hostname: {{ ansible_hostname }}</p>
+    <p>IP: {{ ansible_default_ipv4.address }}</p>
+  </body>
+</html>
+
